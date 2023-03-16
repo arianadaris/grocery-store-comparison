@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1 class="text-center my-lg-4">Shop<span class="text-primary">Club</span></h1>
+<h4 class="text-center">Compare grocery store prices with a few clicks of a button.</h4>
+
+<form class="form-inline mt-5 my-lg-8 d-flex justify-content-center" method="post">
+    <input class="form-control mr-sm-2" type="search" placeholder="Enter Zip Code" area-label="Search" name="zipCode">
+    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+</form>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flashes d-flex justify-content-center mt-3 text-danger">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+{% if name != "" %}
+<h6>Change Location: <u>{{ name }}</u></h6>
+{% endif %}
+{% endblock content %}
