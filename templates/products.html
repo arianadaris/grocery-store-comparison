@@ -14,7 +14,9 @@
     <thead>
         <th scope="col">ID</th>
         <th scope="col">Name</th>
-        <th scope="col">Target ID</th>
+        <th scope="col">Keyword</th>
+        <th scope="col">Detail</th>
+        <th scope="col">Target TCIN</th>
         <th scope="col">Kroger ID</th>
         <th scope="col">Walmart ID</th>
         <th scope="col">Options</th>
@@ -24,7 +26,9 @@
         <tr>
             <td>{{ product._id }}</td>
             <td>{{ product.name }}</td>
-            <td>{{ product.target_id }}</td>
+            <td>{{ product.keyword }}</td>
+            <td>{{ product.detail }}</td>
+            <td>{{ product.target_tcin }}</td>
             <td>{{ product.kroger_id }}</td>
             <td>{{ product.walmart_id }}</td>
             <td>
