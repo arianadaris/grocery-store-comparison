@@ -4,11 +4,22 @@
 <h1 class="text-center mt-lg-4">Products</h1>
 
 <h4 class="text-center mt-lg-4">Add a Product</h4>
-<form class="form-inline my-lg-8 d-flex justify-content-center" method="post">
+<form class="form-inline my-lg-8 d-flex justify-content-center" action="{{ url_for('products.get_add_by_query') }}" method="POST">
     <label class="form-control mr-sm-2">Product Name</label>
     <input class="form-control mr-sm-2" type="text" name="name">
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Add Product</button>
+    <a href="{{ url_for('products.get_delete_all') }}" class="btn btn-danger mx-2 my-2 my-sm-0">Delete All</a>
 </form>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes d-flex justify-content-center mt-3">
+    {% for category, message in messages %}
+    <p class="{{ category }}">{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 
 <table class="table table-hover mt-5">
     <thead>
@@ -17,22 +28,20 @@
         <th scope="col">Keyword</th>
         <th scope="col">Detail</th>
         <th scope="col">Target TCIN</th>
-        <th scope="col">Kroger ID</th>
-        <th scope="col">Walmart ID</th>
+        <th scope="col">Trader Joes SKU</th>
         <th scope="col">Options</th>
     </thead>
     <tbody>
         {% for product in products %}
         <tr>
-            <td>{{ product._id }}</td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.keyword }}</td>
-            <td>{{ product.detail }}</td>
-            <td>{{ product.target_tcin }}</td>
-            <td>{{ product.kroger_id }}</td>
-            <td>{{ product.walmart_id }}</td>
+            <td>{{ product["id"] }}</td>
+            <td>{{ product["name"] }}</td>
+            <td>{{ product["keyword"] }}</td>
+            <td>{{ product["detail"] }}</td>
+            <td>{{ product["target_tcin"] }}</td>
+            <td>{{ product["traderjoes_sku"] }}</td>
             <td>
-                <a href="{{ url_for('get_delete_product', id=product._id) }}" class="btn btn-danger">Delete</a>
+                <a href="{{ url_for('products.get_delete_product', id=product['id']) }}" class="btn btn-danger">Delete</a>
             </td>
         </tr>
         {% endfor %}

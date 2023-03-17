@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
-# flash() function - stores flashed messages in client's browser session, requires secret key
-# secret key used to secure sessions
-# user can access info stored in session, cannot modify it
-
-import os
 from datetime import timedelta
-
+import requests
 from extensions import db
-from GroceryAPI import *
+
+# Import blueprints
+from api.GroceryAPI import *
+from products.Products import *
+from comparisons.Compare_Products import *
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "35238e7d4ac5422360b107255fbd18a9eab2d5aa0ae68c20"
@@ -15,8 +14,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///products.sqlite3"
 app.config['SQLACHEMY_TRACK_MODIFICATIONS'] = False
 app.permanent_session_lifetime = timedelta(minutes=5)
 
+# Register URL blueprints
+app.register_blueprint(products_bp, url_prefix='/products')
+app.register_blueprint(compare_bp, url_prefix='/compare')
+
 # Register API
 app.register_blueprint(api_bp, url_prefix='/api')
+port = 5002
+api_url = f'http://127.0.0.1:{port}/api/'
 
 # Connect to db
 db.init_app(app)
@@ -25,56 +30,43 @@ from Models import *
 
 @app.route('/', methods=['GET', 'POST'])
 def get_home():
+    product_ids = [1,2,3]
+    products = []
+
     if request.method == 'POST':
-        
-        zipCode = request.form['zipCode']
-        if(len(zipCode) >= 5 and zipCode.isdigit()):
-            coords = getCoords(zipCode)
+        zipcode = request.form['zipcode']
+
+        # Form validation
+        if(len(zipcode) >= 5 and zipcode.isdigit()):
+            # Call API to retrieve keyword
+            r = requests.request("GET", f'{api_url}coords/{zipcode}')
+            coords = r.json()
+
             session.permanent = True
             session["longitude"] = coords['longitude']
             session["latitude"] = coords['latitude']
-            session["name"] = coords['name']
+            session["location"] = coords['name']
+            session["zipcode"] = coords['zipcode']
         else:
             flash('Please input a valid zip code.')
-    name = ""
-    if 'name' in session:
-        name = session['name']
-    return render_template("home.html", name=name)
 
-@app.route('/products', methods=['GET', 'POST'])
-def get_view():
-    # name = ""
-    # if request.method == 'POST':
-    #     name = request.form['name']
-    #     product = products(name)
-    #     db.session.add(product)
-    #     db.session.commit()
-    #     redirect(url_for('get_view'))
+    location = ""
+    if 'location' in session:
+        location = session['location']
+        latitude = session['latitude']
+        longitude = session['longitude']
+        zipcode = session['zipcode']
 
-    query = ""
+        for product_id in product_ids:
+            r = requests.request('GET', f'{api_url}prices/id={product_id}&lat={latitude}&lon={longitude}&zip={zipcode}')
 
-    if request.method == "POST":
-        query = request.form['name'].replace(" ", "+")
-        result = get_target_tcin(query)
-        print('Success' if result else 'Failure')
-    
-    return render_template('products.html', products=products.query.all())
+            products.append(r.json())
 
-@app.route('/products/delete/<int:id>')
-def get_delete_product(id):
-    product_to_delete = products.query.get_or_404(id)
-
-    try:
-        db.session.delete(product_to_delete)
-        db.session.commit()
-    except Exception as e:
-        print(e)
-
-    return redirect(url_for('get_view'))
+    return render_template("home.html", name=location, products=products)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
 
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=port)
