@@ -46,7 +46,7 @@ def get_home():
         zipcode = session['zipcode']
 
         for product_id in product_ids:
-            r = requests.request('GET', f'{api_url}prices/id={product_id}&lat={latitude}&lon={longitude}&zip={zipcode}')
+            r = requests.request('GET', f'{api_url}prices/id={product_id}&zip={zipcode}')
 
             products.append(r.json())
 

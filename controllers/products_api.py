@@ -26,9 +26,9 @@ def get_products():
         store_dict = {}
 
         if store == 'Target':
-            products_list = products.query.filter(products.target_tcin != 0)
+            products_list = products.query.filter(products.target_tcin != '0').all()
         elif store == 'Trader Joes':
-            products_list = products.query.filter(products.traderjoes_sku != 0)
+            products_list = products.query.filter(products.traderjoes_sku != '0').all()
 
         store_dict[store] = [product.as_dict() for product in products_list]
         all_products.append(store_dict)

@@ -66,28 +66,11 @@
         <th scope="col">Trader Joes SKU</th>
         <th scope="col">Options</th>
     </thead>
-    <tbody>
-        {% with stores = products.map((store) => Object.keys(store)[0]) %}
-        {% for index, store_dict in enumerate(products) %}
-            {% for product in store_dict[index] %}
-            <tr>
-                <td>{{ product["id"] }}</td>
-                <td>{{ product["name"] }}</td>
-                <td>{{ product["keyword"] }}</td>
-                <td>{{ product["detail"] }}</td>
-                <td>{{ product["target_tcin"] }}</td>
-                <td>{{ product["traderjoes_sku"] }}</td>
-                <td>
-                    <a href="{{ url_for('products.get_delete_product', id=product['id']) }}" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        {% endfor %}
-        {% endwith %}
-    </tbody>
+    <tbody id="table-body">
 </table>
 
-<script>
+<script type="text/javascript">
+    // Functionality for autocompleting the input box
     $(document).ready(function() {
         $.ajax({
             url: '{{ url_for("autocomplete.autocomplete_keywords") }}'
@@ -99,16 +82,66 @@
         })
     });
 
-    var storeDropdown = document.getElementById('store-menu');
+    // Functionality for the dropdown menu behaviors
+    var storeDropdown = document.getElementById('store-dropdown');
     console.log(storeDropdown)
     storeDropdown.addEventListener("change", function() {
         storeDropdown.name = storeDropdown.value;
     });
 
-    var keywordDropdown = document.getElementById('keyword-menu');
+    var keywordDropdown = document.getElementById('keyword-dropdown');
     keywordDropdown.addEventListener("change", function() {
         keywordDropdown.name = keywordDropdown.value;
     });
+
+    // Functionality for loading the product data into the table
+    const products = JSON.parse('{{products|tojson}}');
+    var stores = products.map((store) => Object.keys(store)[0])
+    var tableBody = document.getElementById('table-body')
+
+    productKeys = Object.keys(products[0][stores[0]]['0'])
+
+    products.forEach((store_dict, index) => {
+        store = stores[index]
+        for(product in store_dict[store]) {
+            // Create a row for each product
+            row = document.createElement('tr')
+
+            product = store_dict[store][product]
+
+            // Create td elements for each entry in the product dictionary
+            var tds = []            
+            for (key in productKeys) {
+                if (key != 'image') {
+                    td = document.createElement('td')
+                    td.textContent = product[productKeys[key]]
+                    tds.push(td)
+                }
+            }
+
+            // Enter tds into the row in a specific order
+            row.appendChild(tds[1]) // id
+            row.appendChild(tds[4]) // name
+            row.appendChild(tds[3]) // keyword
+            row.appendChild(tds[0]) // detail
+            
+            // Enter remaining tds dynamically (ignore tds[2] as that's the image)
+            for(var i = 5; i < tds.length; i++)
+                row.appendChild(tds[i])
+
+            // Add delete button
+            td = document.createElement('td')
+            deleteButton = document.createElement('button')
+            deleteButton.textContent = 'Delete'
+            deleteButton.classList.add('btn', 'btn-danger')
+            td.appendChild(deleteButton)
+
+            row.appendChild(td)
+
+            tableBody.appendChild(row)
+        }
+    })
+    
 </script>
 
 {% endblock %}

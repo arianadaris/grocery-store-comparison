@@ -28,29 +28,41 @@ def get_products_by_keyword(keyword):
 
         store_dict[store] = [product.as_dict() for product in products_list]
         all_products.append(store_dict)
-        
+
     return all_products
 
 @filter_bp.route('/target/')
 @filter_bp.route('/target/<keyword>')
 def get_target_products(keyword=None):
+    target = {
+        'Target': {}
+    }
+
     if keyword:
         print('Filtering by specific products')
-        target_products = products.query.filter(products.target_tcin != 0, products.keyword == keyword).all()
+        target_products = products.query.filter(products.target_tcin != '0', products.keyword == keyword).all()
     else:
         print('Filtering by store')
-        target_products = products.query.filter(products.target_tcin != 0).all()
+        target_products = products.query.filter(products.target_tcin != '0').all()
+    
+    target['Target'] = [product.as_dict() for product in target_products]
 
-    return [product.as_dict() for product in target_products]
+    return target
 
 @filter_bp.route('/trader_joes')
 @filter_bp.route('/trader_joes/<keyword>')
 def get_trader_joes_products(keyword=None):
+    trader_joes = {
+        'Trader Joes': {}
+    }
+
     if keyword:
         print('Filtering by specific products')
-        trader_joes_products = products.query.filter(products.traderjoes_sku != 0, products.keyword == keyword).all()
+        trader_joes_products = products.query.filter(products.traderjoes_sku != '0', products.keyword == keyword).all()
     else:
-        trader_joes_products = products.query.filter(products.traderjoes_sku != 0).all()
+        trader_joes_products = products.query.filter(products.traderjoes_sku != '0').all()
         print('Filtering by store')
 
-    return [product.as_dict() for product in trader_joes_products]
+    trader_joes['Trader Joes'] = [product.as_dict() for product in trader_joes_products]
+    
+    return trader_joes

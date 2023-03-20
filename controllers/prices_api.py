@@ -18,8 +18,8 @@ URL - /api/prices/id=1&lat=12.34&lon=12.45&zip=85201
         zipcode: string - 5 digit zipcode number
     Returns - dictionary containing product information and prices for various stores
 """
-@prices_api_bp.route('/id=<int:product_id>&lat=<lat>&lon=<lon>&zip=<zipcode>')
-def get_price(product_id, lat, lon, zipcode):
+@prices_api_bp.route('/id=<int:product_id>&zip=<zipcode>')
+def get_price(product_id, zipcode):
     product = products.query.get_or_404(product_id)
 
     if product.target_tcin != '0':

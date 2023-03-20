@@ -12,7 +12,7 @@ from controllers.products_api import *
 from controllers.prices_api import *
 from controllers.geocode_api import *
 from controllers.filter.autocomplete import *
-from controllers.filter.filter import *
+from controllers.filter.filter_api import *
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "35238e7d4ac5422360b107255fbd18a9eab2d5aa0ae68c20"

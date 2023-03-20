@@ -14,8 +14,6 @@ def get_products():
     r = requests.request('GET', api_url+'products', headers={}, data={})
     products = r.json()
 
-    print(products)
-
     return render_template('products.html', products=products, keywords=get_keywords(), stores=get_stores())
 
 @products_bp.route('/add-by-query', methods=['POST'])
@@ -74,10 +72,13 @@ def get_delete_all():
 def filter_by_keyword():
     word = store = ""
     if request.method == "POST":
-        if 'keyword-dropdown' in request.form:
-            word = request.form['keyword-dropdown']
-        if 'store-dropdown' in request.form:
-            store = request.form['store-dropdown']
+        if not 'keyword-dropdown' in request.form:
+            word = list(request.form.keys())[0]
+        if not 'store-dropdown' in request.form:
+            store = list(request.form.keys())[1]
+
+        if word == "" and store == "":
+            return redirect(url_for('products.get_products'))
 
         filtered_products = []
 
@@ -94,9 +95,7 @@ def filter_by_keyword():
 
         filtered_products = r.json()
 
-    print(filtered_products)
-
-    return render_template('products.html', products=filtered_products, filter=[word, store], keywords=get_keywords(), stores=get_stores())
+    return render_template('products.html', products=[filtered_products], filter=[word, store], keywords=get_keywords(), stores=get_stores())
 
 
 ## Helper function

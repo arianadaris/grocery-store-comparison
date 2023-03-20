@@ -21,16 +21,73 @@
     {% endfor %}
 </form>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <h1 class="text-center">Target</h1>
-            
-        </div>
-        <div class="col">
-            <h1 class="text-center">Trader Joes</h1>
-        </div>
+<div class="container-fluid pt-4">
+    <div class="row px-5" id="compare-container">
     </div>
 </div>
+
+<script>
+    const products = JSON.parse('{{products|tojson}}');
+    var stores = products.map((store) => Object.keys(store)[0])
+    var container = document.getElementById('compare-container')
+
+    // For each store in the products list
+    products.forEach((store_dict, index) => {
+        store = stores[index]
+        
+        // Create a div for this store
+        storeDiv = document.createElement('div')
+        storeDiv.classList.add('col')
+
+        storeH1 = document.createElement('h1')
+        storeH1.classList.add('text-center')
+        storeH1.textContent = store
+
+        // Grab the first product dictionary
+        product = store_dict[store][0]
+        
+        // Create the card container
+        card = document.createElement('div')
+        card.classList.add('form-control', 'd-flex', 'p-4')
+        card.style.gap = '20px'
+
+        // Create the card image
+        cardImg = document.createElement('img')
+        cardImg.src = product['image']
+        cardImg.style.width = 'fit-content'
+        cardImg.style.height = '4rem'
+        cardImg.style.objectFit = 'contain';
+        cardImg.classList.add('card-image')
+
+        // Create a div to contain card text
+        cardTextDiv = document.createElement('div')
+
+        // Add the card title
+        cardTitle = document.createElement('h5')
+        cardTitle.classList.add('card-title')
+        cardTitle.textContent = product['name']
+
+        // Add card keyword
+        cardKeyword = document.createElement('h6')
+        cardKeyword.classList.add('card-text')
+        cardKeyword.textContent = product['keyword']
+
+        // Append elements to the cardTextDiv
+        cardTextDiv.append(cardTitle)
+        cardTextDiv.append(cardKeyword)
+
+        // Append elements to the store div
+        storeDiv.appendChild(storeH1)
+
+        // Append elements to the card
+        card.appendChild(cardImg)
+        card.appendChild(cardTextDiv)
+        storeDiv.appendChild(card)
+
+
+        container.appendChild(storeDiv)
+    })
+
+</script>
 
 {% endblock %}
