@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1 class="text-center mt-lg-4 mb-4">Compare Products</h1>
+
+<form class="form-inline my-lg-8 d-flex justify-content-center" style="gap: 10px;">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspoopup="true" aria-expanded="false">
+            Keyword
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for keyword in keywords %}
+                <a class="dropdown-item" href="{{ url_for('compare.compare_keyword', keyword=keyword) }}">{{ keyword }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% for filtered_word in filter %}
+    <div class="form-control d-flex" style="width: fit-content; gap: 10px">
+        <p class="my-auto">{{ filtered_word }}</p>
+    </div>
+    {% endfor %}
+</form>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Target</h1>
+            
+        </div>
+        <div class="col">
+            <h1 class="text-center">Trader Joes</h1>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

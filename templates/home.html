@@ -5,7 +5,7 @@
 <h4 class="text-center">Compare grocery store prices with a few clicks of a button.</h4>
 
 <form class="form-inline mt-5 my-lg-8 d-flex justify-content-center" method="post">
-    <input class="form-control mr-sm-2" type="search" placeholder="Enter Zip Code" area-label="Search" name="zipcode">
+    <input class="form-control mr-sm-2" type="search" placeholder="Enter Zip Code" area-label="Search" name="zipcode" id="autocomplete" autocomplete="off">
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
 </form>
 
@@ -27,8 +27,8 @@
     <h1>Popular Products</h1>
     <div class="d-flex my-4" style="gap: 20px">
         {% for product in products %}
-        <div class="card" style="width: 18rem;">
-            <img class="card-img-top p-4" src="{{ product['image'] }}" alt="{{ product['name'] }}">
+        <div class="card p-4" style="width: 18rem;">
+            <img class="card-img-top mx-auto w-50 h-50" style="height: 1rem; width: 1rem;" src="{{ product['image'] }}" alt="{{ product['name'] }}">
             <div class="card-body">
                 <h5 class="card-title">{{ product['name'] }}</h5>
                 <ul class="list-group list-group-flush">
@@ -40,5 +40,18 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '{{ url_for("autocomplete.autocomplete_zipcodes") }}'
+        }).done(function (data) {
+            $('#autocomplete').autocomplete({
+                source: data,
+                minLength: 1
+            })
+        })
+    })
+</script>
 
 {% endblock content %}

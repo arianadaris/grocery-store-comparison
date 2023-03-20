@@ -6,7 +6,7 @@
 <h4 class="text-center mt-lg-4">Add a Product</h4>
 <form class="form-inline my-lg-8 d-flex justify-content-center" action="{{ url_for('products.get_add_by_query') }}" method="POST">
     <label class="form-control mr-sm-2">Product Name</label>
-    <input class="form-control mr-sm-2" type="text" name="name">
+    <input class="form-control mr-sm-2" type="text" name="name" id="autocomplete" autocomplete="off">
     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Add Product</button>
     <a href="{{ url_for('products.get_delete_all') }}" class="btn btn-danger mx-2 my-2 my-sm-0">Delete All</a>
 </form>
@@ -21,7 +21,42 @@
 {% endif %}
 {% endwith %}
 
-<table class="table table-hover mt-5">
+<div class="d-flex align-items-center justify-content-between">
+    <form class="d-flex mt-4" style="gap: 20px;" action="{{ url_for('products.filter_by_keyword') }}" method="POST">
+        <label class="my-auto form-control" style="width: fit-content;">Filter</label>
+        <!-- Keyword Dropdown -->
+        <select id="keyword-dropdown" name="keyword-dropdown" class="form-control" style="width: fit-content;">
+            <option value="" selected>Keyword</option>
+            {% for keyword in keywords %}
+            <option class="dropdown-item" value="{{ keyword }}">{{ keyword }}</option>
+            {% endfor %}
+        </select>
+    
+        <!-- Store Dropdown -->
+        <select id="store-dropdown" name="store-dropdown" class="form-control" style="width: fit-content;">
+            <option value="" selected>Store</option>
+            {% for store in stores %}
+            <option class="dropdown-item" value="{{ store }}">{{ store }}</option>
+            {% endfor %}
+        </select>
+    
+        <button class="btn btn-outline-primary" type="submit">Apply Filter</button>
+        <!-- Showing the active filter -->
+        {% for filtered_word in filter %}
+        {% if filtered_word != "" %}
+        <div class="form-control d-flex" style="width: fit-content; gap: 10px;">
+            <p class="my-auto" >{{ filtered_word }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </form>
+    {% if filter %}
+        <a class="btn btn-outline-danger my-auto" href="{{ url_for('products.get_products') }}">Remove Filters</a>
+    {% endif %}
+</div>
+
+
+<table class="table table-hover mt-4">
     <thead>
         <th scope="col">ID</th>
         <th scope="col">Name</th>
@@ -32,19 +67,48 @@
         <th scope="col">Options</th>
     </thead>
     <tbody>
-        {% for product in products %}
-        <tr>
-            <td>{{ product["id"] }}</td>
-            <td>{{ product["name"] }}</td>
-            <td>{{ product["keyword"] }}</td>
-            <td>{{ product["detail"] }}</td>
-            <td>{{ product["target_tcin"] }}</td>
-            <td>{{ product["traderjoes_sku"] }}</td>
-            <td>
-                <a href="{{ url_for('products.get_delete_product', id=product['id']) }}" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
+        {% with stores = products.map((store) => Object.keys(store)[0]) %}
+        {% for index, store_dict in enumerate(products) %}
+            {% for product in store_dict[index] %}
+            <tr>
+                <td>{{ product["id"] }}</td>
+                <td>{{ product["name"] }}</td>
+                <td>{{ product["keyword"] }}</td>
+                <td>{{ product["detail"] }}</td>
+                <td>{{ product["target_tcin"] }}</td>
+                <td>{{ product["traderjoes_sku"] }}</td>
+                <td>
+                    <a href="{{ url_for('products.get_delete_product', id=product['id']) }}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
         {% endfor %}
+        {% endwith %}
     </tbody>
 </table>
+
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '{{ url_for("autocomplete.autocomplete_keywords") }}'
+        }).done(function (data) {
+            $('#autocomplete').autocomplete({
+                source: data,
+                minLength: 1
+            })
+        })
+    });
+
+    var storeDropdown = document.getElementById('store-menu');
+    console.log(storeDropdown)
+    storeDropdown.addEventListener("change", function() {
+        storeDropdown.name = storeDropdown.value;
+    });
+
+    var keywordDropdown = document.getElementById('keyword-menu');
+    keywordDropdown.addEventListener("change", function() {
+        keywordDropdown.name = keywordDropdown.value;
+    });
+</script>
+
 {% endblock %}
